@@ -12,6 +12,11 @@ namespace SampleRxLogAnalyserLib.SampleData
         public Guid App2 { get; set; }
         public Guid App2ActivityId1 { get; set; }
 
+        public LogQueue CreateLogQueue()
+        {
+            return new LogQueue(DateTime.Now, 40);
+        }
+
         public SampleLogMessageCreator()
         {
             App1 = Guid.NewGuid();

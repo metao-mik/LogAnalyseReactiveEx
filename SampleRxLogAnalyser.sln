@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SampleRxLogAnalyserLib", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RxLogAnalyserXUnitTests", "RxLogAnalyserXUnitTests\RxLogAnalyserXUnitTests.csproj", "{DFC9FBA6-7394-4EFF-8857-B58DCA389840}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleConsoleInputAnalyser", "SampleConsoleInputAnalyser\SampleConsoleInputAnalyser.csproj", "{491D3B1F-A452-4D5E-90E9-386C133AF01E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{DFC9FBA6-7394-4EFF-8857-B58DCA389840}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DFC9FBA6-7394-4EFF-8857-B58DCA389840}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DFC9FBA6-7394-4EFF-8857-B58DCA389840}.Release|Any CPU.Build.0 = Release|Any CPU
+		{491D3B1F-A452-4D5E-90E9-386C133AF01E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{491D3B1F-A452-4D5E-90E9-386C133AF01E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{491D3B1F-A452-4D5E-90E9-386C133AF01E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{491D3B1F-A452-4D5E-90E9-386C133AF01E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

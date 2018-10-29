@@ -15,7 +15,12 @@ namespace SampleRxLogAnalyserLib
 
         public LogQueue()
         {
+        }
+
+        public LogQueue(DateTime startDateTime, int sleepIntervalMs)
+        {
             currentDateTime = DateTime.Now;
+            SleptTime = new TimeSpan(sleepIntervalMs);
         }
 
         public IObservable<LogMessageModel> MessagesObserver {
@@ -32,14 +37,24 @@ namespace SampleRxLogAnalyserLib
             AddMessage(appId, activityId, message, 0);
         }
 
-        public void AddMessage(Guid appId, Guid activityId, string message, int secondsSleep )
+        public void AddMessage(Guid appId, Guid activityId, string message, int secondsSleep)
         {
-            var m = new LogMessageModel() { AppId = appId, ActivityId = activityId, DateTime = currentDateTime, LogMessage = message };
+            if (currentDateTime != DateTime.MinValue)
+            {
+                currentDateTime += new TimeSpan(secondsSleep);
+            }
+            AddMessage(appId, activityId, message, currentDateTime);
+        }
+
+        public void AddMessage(Guid appId, Guid activityId, string message, DateTime datetime)
+        {
+            if (datetime == DateTime.MinValue) datetime = DateTime.Now;
+            var m = new LogMessageModel() { AppId = appId, ActivityId = activityId, DateTime = datetime, LogMessage = message };
 
             messages.Add(m);
             messagesSubject.OnNext(m);
-            if (secondsSleep > 0) Sleep(secondsSleep);
         }
+
 
         public void Sleep(TimeSpan time)
         {
