@@ -9,6 +9,8 @@ namespace SampleRxLogAnalyser
     {
         static void Main(string[] args)
         {
+            // www.introtorx.com
+
             Console.WriteLine("Hello World!");
             //var logmessages = System.reaIObservable<>
 
@@ -39,6 +41,8 @@ namespace SampleRxLogAnalyser
                     MaxDatetime = grp.Max(item => item.DateTime)
                 }
                 )
+
+
                 .Subscribe(item =>
                     Console.WriteLine(string.Format("ActivityId: {0}, Anzahl Msg: {1}, Start: {2}, Ende: {3}",  
                         item.ActivityId, item.AnzahlMeldungen, item.MinDatetime, item.MaxDatetime)));

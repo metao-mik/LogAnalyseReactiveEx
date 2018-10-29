@@ -22,6 +22,11 @@ namespace SampleRxLogAnalyserLib
             get { return messagesSubject; }
         }
 
+        public IObserver<LogMessageModel> MessagerActor
+        {
+            get { return messagesSubject; }
+        }
+
         public void AddMessage(Guid appId, Guid activityId, string message)
         {
             AddMessage(appId, activityId, message, 0);
