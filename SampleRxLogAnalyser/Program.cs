@@ -25,36 +25,33 @@ namespace SampleRxLogAnalyser
                 //                .GroupBy(log => log.ActivityId)
 
                 // https://stackoverflow.com/questions/41577134/rx-groupbyuntil-with-sliding-until
-                .GroupByUntil(log => log.ActivityId, 
+                .GroupByUntil(log => log.ActivityId,
                     log => log,
                     group => group
-                        .Select(message => Observable.Timer(new TimeSpan(0,0,5)))
+                        .Select(message => Observable.Timer(new TimeSpan(0, 0, 5)))
                         .Switch()
                 )
-                //                .SelectMany(grp => grp.Count())
                 .Select(grp => new
                 {
                     ActivityId = grp.Key,
-                    AnzahlMeldungen = grp.Where(item => item.LogMessage.StartsWith("Prozess info")).Count().Take(1),
-                    StartDatetime = grp.Take(1),
-                    MinDatetime = grp.Min(item => item.DateTime),
-                    MaxDatetime = grp.Max(item => item.DateTime)
-                }
-                )
-
+                    AnzahlMeldungen = grp.Where(item => item.LogMessage.StartsWith("Prozess info")).Count(),
+                    //MinDatetime = grp.Min(item => item.DateTime),
+                    //MaxDatetime = grp.Max(item => item.DateTime)
+                })
+                .Select(x => Observable.FromAsync(async () => new
+                {
+                    ActivityId = x.ActivityId,
+                    AnzahlMeldungen = await x.AnzahlMeldungen,
+                    //MinDatetime = await x.MinDatetime,
+                    //MaxDatetime = await x.MaxDatetime
+                }))
+                .Concat()
 
                 .Subscribe(item =>
-                    Console.WriteLine(string.Format("ActivityId: {0}, Anzahl Msg: {1}, Start: {2}, Ende: {3}",  
-                        item.ActivityId, item.AnzahlMeldungen, item.MinDatetime, item.MaxDatetime)));
-/*                
-                .Subscribe(grp =>  Console.WriteLine("Hallo " + grp.Key + " " + grp.Count()));
-*/
+                    Console.WriteLine(string.Format("ActivityId: {0}, Anzahl Msg: {1}, ", //Start: {2}, Ende: {3}",
+                        item.ActivityId, item.AnzahlMeldungen))); //, item.MinDatetime, item.MaxDatetime)));
 
-/*
-                .Subscribe(value => 
-                    Console.WriteLine(String.Format("App: {0}, Activity: {1}, DateTime: {2}: {3}", 
-                                value.AppId, value.ActivityId, value.DateTime, value.LogMessage)));
-*/
+
             messageCreator.CreateSimpleSampleData(messages);
 
             Console.ReadLine();

@@ -20,7 +20,7 @@ namespace RxLogAnalyserXUnitTests
             var results = messages.MessagesObserver
                     .Where(log => log.AppId == dataCreator.App1)
                     .Subscribe(
-                        item => System.Diagnostics.Trace.WriteLine(string.Format("Item: {0}, {2}: {1}", item.AppId, item.LogMessage, item.ActivityId)),
+                        item => System.Diagnostics.Trace.WriteLine(string.Format("Item: {0}, {2}: {1}, {3}", item.AppId, item.LogMessage, item.DateTime, item.ActivityId)),
                         err => System.Diagnostics.Trace.WriteLine(@"Error: {0}", err.Message),
                         () => System.Diagnostics.Trace.WriteLine("Completed!"));
 
@@ -43,16 +43,9 @@ namespace RxLogAnalyserXUnitTests
                             .Select(message => Observable.Timer(new TimeSpan(0, 0, 5)))
                             .Switch()
                     )
-/*
-                    .SelectMany(grp =>
-                    {
-                        grp..
-                        return grp.Scan(new ,)
-                    })
-*/
                     .Select(grp => new { ActivityId = grp.Key, Anz = grp.Count() })
                     .Subscribe(
-                        item => System.Diagnostics.Trace.WriteLine(string.Format("Activity: {0}, Anz: {1}", item.ActivityId, item.Anz)),  // mit .FirstOrDefault() blokiert
+                        async item => System.Diagnostics.Trace.WriteLine(string.Format("Activity: {0}, Anz: {1}", item.ActivityId, await item.Anz)),  // mit .FirstOrDefault() blokiert
  //                       item => System.Diagnostics.Trace.WriteLine(string.Format("Item: {0}, {2}: {1}", item.Key, item.AppId, item.LogMessage, item.ActivityId)),
                         err => System.Diagnostics.Trace.WriteLine(@"Error: {0}", err.Message),
                         () => System.Diagnostics.Trace.WriteLine("Completed!"));
@@ -63,6 +56,81 @@ namespace RxLogAnalyserXUnitTests
             messages.MessagerActor.OnCompleted();
         }
 
+
+        [Fact]
+        public void Test_GroupSampleData1WithConcat()
+        {
+            var messages = new LogQueue();
+            var messageCreator = new SampleLogMessageCreator();
+
+            // Subscribe Queue 
+            messages.MessagesObserver
+                .Where(log => log.AppId == messageCreator.App1)
+
+                .GroupByUntil(log => log.ActivityId,
+                    log => log,
+                    group => group
+                        .Select(message => Observable.Timer(new TimeSpan(0, 0, 3)))
+                        .Switch()
+                )
+                .Select(grp => new
+                {
+                    ActivityId = grp.Key,
+                    AnzahlMeldungen = grp.Where(item => item.LogMessage.StartsWith("Prozess info")).Count(),
+                    //MinDatetime = grp.Min(item => item.DateTime),
+                    //MaxDatetime = grp.Max(item => item.DateTime)
+                })
+                .Select(x => Observable.FromAsync(async () => new
+                {
+                    ActivityId = x.ActivityId,
+                    AnzahlMeldungen = await x.AnzahlMeldungen,
+                    //MinDatetime = await x.MinDatetime,
+                    //MaxDatetime = await x.MaxDatetime
+                }))
+                .Concat()
+
+                .Subscribe(item =>
+                    System.Diagnostics.Trace.WriteLine(string.Format("ActivityId: {0}, Anzahl Msg: {1}, ", //Start: {2}, Ende: {3}",
+                        item.ActivityId, item.AnzahlMeldungen))); //, item.MinDatetime, item.MaxDatetime)));
+
+            messageCreator.CreateSimpleSampleData(messages);
+
+            System.Threading.Thread.Sleep(1000 * 4);
+        }
+
+
+        [Fact]
+        public void Test_GroupSampleData1AsyncAwait()
+        {
+            var messages = new LogQueue();
+            var messageCreator = new SampleLogMessageCreator();
+
+            // Subscribe Queue 
+            messages.MessagesObserver
+                .Where(log => log.AppId == messageCreator.App1)
+
+                .GroupByUntil(log => log.ActivityId,
+                    log => log,
+                    group => group
+                        .Select(message => Observable.Timer(new TimeSpan(0, 0, 3)))
+                        .Switch()
+                )
+                .Select(grp => new
+                {
+                    ActivityId = grp.Key,
+                    AnzahlMeldungen = grp.Where(item => item.LogMessage.StartsWith("Prozess info")).Count(),
+                    //MinDatetime = grp.Min(item => item.DateTime),
+                    //MaxDatetime = grp.Max(item => item.DateTime)
+                })
+
+                .Subscribe(async item =>
+                    System.Diagnostics.Trace.WriteLine(string.Format("ActivityId: {0}, Anzahl Msg: {1}, ", //Start: {2}, Ende: {3}",
+                        item.ActivityId, await item.AnzahlMeldungen))); //, item.MinDatetime, item.MaxDatetime)));
+
+            messageCreator.CreateSimpleSampleData(messages);
+
+            System.Threading.Thread.Sleep(1000 * 4);
+        }
 
         [Fact]
         public void Test_SampleData1()
