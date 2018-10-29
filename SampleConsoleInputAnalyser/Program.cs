@@ -27,6 +27,7 @@ namespace SampleConsoleInputAnalyser
 
             myTrace.WriteLine("Programmende");
 
+
             myTrace.Quit();
             Console.WriteLine("Ende");
             System.Threading.Thread.Sleep(1000 * 5);
